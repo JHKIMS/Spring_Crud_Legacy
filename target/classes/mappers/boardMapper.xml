@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.board.mappers.board">
+
+	<!-- 게시물 목록 -->
+	<select id="list" resultType="com.board.domain.BoardVO">
+		select
+			idx, title, content, writer,
+			toDate, viewCnt
+		from spboard
+	</select>
+	<!-- 게시물 목록 -->
+
+
+	<!-- 게시물 작성하기 -->
+	<insert id="write" parameterType="com.board.domain.BoardVO">
+		insert into
+			spboard(title, content, writer)
+		values(#{title}, #{content}, #{writer})
+	</insert>
+	<!-- 게시물 작성하기 -->
+
+
+	<!-- 게시물 조회(글 읽기) -->
+	<select id="view" parameterType="int" resultType="com.board.domain.BoardVO">
+		select
+			idx, title, content, writer, toDate, viewCnt
+		from spboard
+			where idx = #{idx}
+	</select>
+	<!-- 게시물 조회(글 읽기) -->
+
+	<!-- 게시물 수정 -->
+	<update id="modify" parameterType="com.board.domain.BoardVO">
+		update spboard
+		set
+			title = #{title},
+			content = #{content},
+			writer = #{writer}
+		where idx = #{idx}
+	</update>
+	<!-- 게시물 수정 -->
+
+	<!-- 게시물 삭제 -->
+	<delete id="delete" parameterType="int">
+		delete
+		from spboard
+		where idx = #{idx}
+	</delete>
+	<!-- 게시물 삭제 -->
+
+	<!-- 게시물 총 갯수 -->
+	<select id="count" resultType="int"> 
+		select count(idx) from spboard
+	</select>
+	<!-- 게시물 총 갯수 -->
+
+	<!-- 게시물 목록 + 페이징 -->
+	<select id="listPage" parameterType="hashMap" resultType="com.board.domain.BoardVO">
+		select
+			idx, title, writer, toDate, viewCnt
+		from spboard
+		order by idx desc
+			limit #{displayPost}, #{postNum}
+	</select>
+	<!-- 게시물 목록 + 페이징 -->
+	
+	<!--  검색하기 기능 -->
+	<select id="listPageSearch" parameterType="hashMap" resultType="com.board.domain.BoardVO">
+		select
+			idx, title, writer, toDate, viewCnt
+		from spboard
+		
+		<if test='searchType.equals("title")'>
+		WHERE title LIKE concat('%', #{keyword}, '%')
+		</if>
+		
+		<if test='searchType.equals("content")'>
+		WHERE title LIKE concat('%', #{keyword}, '%')
+		</if>
+		
+		<if test='searchType.equals("title_content")'>
+		WHERE title LIKE concat('%', #{keyword}, '%')
+			or content LIKE concat('%', #{keyword}, '%')
+		</if>
+		
+		<if test='searchType.equals("writer")'>
+		WHERE writer LIKE concat('%', #{keyword}, '%')
+		</if>
+		
+		order by idx desc
+			limit #{displayPost}, #{postNum}
+	</select>
+</mapper>
